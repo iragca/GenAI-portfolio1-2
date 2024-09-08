@@ -8,6 +8,13 @@ st.write("""
 
 user_query = st.text_input("Input here")
 
-# llm_gemini_response = llm_gemini.invoke(user_query)
+llm_response = llm_mistral.invoke(user_query)
+piggie = to_piglatin(llm_response)
+st.write(llm_response)
+st.write(piggie)
 
-# st.write(llm_gemini_response.content)
+
+
+decipher = "Can you decipher this pig latin text?" +"\n" + piggie
+
+st.write(llm_gemini.invoke(decipher).content)

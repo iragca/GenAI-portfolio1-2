@@ -1,4 +1,5 @@
 import streamlit as st
+from pig_latin import translate as to_piglatin
 
 import numpy as np
 import pandas as pd

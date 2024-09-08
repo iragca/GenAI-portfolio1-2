@@ -1,43 +1,20 @@
+VOWELS = {"a", "e", "i", "o", "u"}
+VOWELS_Y = {"a", "e", "i", "o", "u", "y"}
+SPECIALS = {"xr", "yt"}
+
+
 def translate(text):
-    """
-    Translates a given English text into Pig Latin.
-    Parameters:
-    text (str): The English text to be translated.
+    piggyfied = []
 
-    Returns:
-    str: The translated text in Pig Latin.
-    """
-    split = text.split(' ')
+    for word in text.split():
+        if word[0] in VOWELS or word[0:2] in SPECIALS:
+            piggyfied.append(word + "ay")
+            continue
 
-    def translate1(split):
-        text = split
-        vowels = 'aeiou'
+        for pos in range(1, len(word)):
+            if word[pos] in VOWELS_Y:
+                pos += 1 if word[pos] == 'u' and word[pos - 1] == "q" else 0
+                piggyfied.append(word[pos:] + word[:pos] + "ay")
+                break
 
-        # If the word starts with a consonant and 'qu', move 'qu' to the end and add 'ay'
-        if (text[0] not in vowels) and ('qu' in text):
-            for letter in text:
-                if letter in 'aeio':
-                    num = text.find(letter)
-                    return text[num:] + text[:num] + 'ay'
-
-        # If the word starts with a vowel or 'x', 'y', 'r', or 't', simply add 'ay'
-        if (text[0] in vowels) or (text[:2] in 'xryt'):
-            return text + 'ay'
-
-        # If the word starts with a consonant, move the consonant cluster to the end and add 'ay'
-        if (text[0] not in vowels):
-            for index, letter in enumerate(text):
-                if letter in vowels:
-                    return text[index:] + text[:index] + 'ay'
-
-        # If the word ends with 'y', move 'y' to the end and add 'ay'
-        for index, letter in enumerate(text):
-            if letter == 'y':
-                return text[index:] + text[:index] + 'ay'
-
-    return_array = []
-
-    for word in split:
-        return_array.append(translate1(word))
-
-    return ' '.join(return_array)
+    return " ".join(piggyfied)
