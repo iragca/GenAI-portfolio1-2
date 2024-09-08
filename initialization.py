@@ -5,11 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import os
-os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
-
 from langchain.llms import HuggingFaceEndpoint
 """
 langchain deprecation warning: 
