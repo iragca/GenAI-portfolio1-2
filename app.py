@@ -1,10 +1,14 @@
 import streamlit as st
 
-kot_vid_url  = 'https://git.gari-homelab.party/CA_Irag/asset-dump/raw/branch/main/portfolio1/assets/video/kot.webm'
+# import os
+# os.environ["OPENAI_API_KEY"] = ""
+# os.environ["GOOGLE_API_KEY"] = ""
+# os.environ["HUGGINGFACEHUB_API_TOKEN"] = ""
 
-# Display the video
-st.video(kot_vid_url)
+from langchain.llms import HuggingFaceEndpoint
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import OpenAI
 
-x = st.slider('Select a value')
-st.write(x, 'squared is', x * x)
-
+llm_mistral = HuggingFaceEndpoint(repo_id="mistralai/Mistral-7B-Instruct-v0.2")
+llm_gemini = ChatGoogleGenerativeAI(model="gemini-pro")
+llm_openai = OpenAI(model="gpt-3.5-turbo-instruct")
