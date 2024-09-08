@@ -1,0 +1,6 @@
+langchain
+openai
+numpy
+pandas
+matplotlib
+seaborn
