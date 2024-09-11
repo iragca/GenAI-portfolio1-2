@@ -4,17 +4,18 @@ SPECIALS = {"xr", "yt"}
 
 
 def translate(text):
-    piggyfied = []
+    if text != '':
+        piggyfied = []
 
-    for word in text.split():
-        if word[0] in VOWELS or word[0:2] in SPECIALS:
-            piggyfied.append(word + "ay")
-            continue
+        for word in text.split():
+            if word[0] in VOWELS or word[0:2] in SPECIALS:
+                piggyfied.append(word + "ay")
+                continue
 
-        for pos in range(1, len(word)):
-            if word[pos] in VOWELS_Y:
-                pos += 1 if word[pos] == 'u' and word[pos - 1] == "q" else 0
-                piggyfied.append(word[pos:] + word[:pos] + "ay")
-                break
+            for pos in range(1, len(word)):
+                if word[pos] in VOWELS_Y:
+                    pos += 1 if word[pos] == 'u' and word[pos - 1] == "q" else 0
+                    piggyfied.append(word[pos:] + word[:pos] + "ay")
+                    break
 
-    return " ".join(piggyfied)
+        return " ".join(piggyfied)
