@@ -25,6 +25,7 @@ Although this solution can't go against powerful non-reversible encryption like 
 
 ***
 """
+'## Demonstrating LLMs for decrypting weak encryption'
 
 st.image('assets/images/apu1.jpeg')
 
@@ -59,15 +60,100 @@ def decrypt(piglatin_sequence):
     return llm_openai.invoke(personality + piglatin_sequence)
 
 
+
+@st.cache_resource
+def decrypt_base64(base64):
+    personality = """
+    Decrypt this base64 encoded string.\n\n
+    """
+
+    return llm_openai.invoke(personality + base64)
+
+@st.cache_resource
+def decrypt_SHA254(SHA256):
+    personality = """
+    Decrypt this SHA256 encoded string.\n\n
+    """
+
+    return llm_openai.invoke(personality + SHA256)
+
 user_query = st.text_input('Ask Apu')
+show_desc = False
 
 
-llm_answer = ask_apu(user_query)
+if user_query != '':
+    llm_answer = ask_apu(user_query)
+    st.write(f"__Apu (mistralai/Mistral-7B-Instruct-v0.2)__ \n\n{llm_answer}")
 
-st.write(llm_answer)
 
-st.write(to_piglatin(llm_answer))
+    st.write("""
+    ***
+    """)
+    st.write("__Encrypted Pig Latin message__ ")
+    st.write(f"{to_piglatin(llm_answer)}")
+    st.write("""
+    ***
+    """)
+    '__Decrypting using OpenAI 3.5B Turbo model__'
+    st.write(decrypt(to_piglatin(llm_answer)))
+    show_desc = True
 
-st.write(decrypt(to_piglatin(llm_answer)))
+if show_desc:
+    '\n\n'
+    '### Observations'
+    'Depending on luck and on the model, right now it _can_ partially decrypt a weak encryption like Pig Latin.'
 
-st.write('asdfhkah')
+'## Demonstrating LLMs for decrypting Base64'
+
+import base64
+sample_string = st.text_input('Encode to Base64')
+
+if sample_string != '':
+
+    sample_string_bytes = sample_string.encode("ascii")
+    base64_bytes = base64.b64encode(sample_string_bytes)
+    base64_string = base64_bytes.decode("ascii")
+
+    '__Base64__'
+    f'{base64_string}'
+    ' *** '
+
+    ascii_string = base64_string.encode("ascii")
+    decoded_bytes = base64.b64decode(ascii_string)
+    decoded_string = decoded_bytes.decode("ascii")
+
+    openai_base64 = decrypt_base64(base64_string)
+
+    '__Decrypting base64 using OpenAI 3.5b Turbo model__'
+
+    f'{openai_base64}'
+
+
+import hashlib
+"## Let's try to do the impossible: Decoding SHA256"
+
+
+sha_string = st.text_input('Encode to SHA256')
+sha256_desc = False
+
+if sha_string != '':
+    '__SHA256__'
+
+    hash256 = hashlib.sha256(bytes(sha_string, 'utf-8')).hexdigest()
+    st.write(hash256)
+
+    ' *** '
+
+    llm_answer = decrypt_SHA254(hash256)
+
+    st.write(llm_answer)
+    sha256_desc = True
+
+if sha256_desc:
+    '\n\n'
+    '### Observations'
+    "The model and its guesses are not correct. Maybe it outright told you it can't decrypt SHA256"
+
+    "Verdict: Generative AI can't decrypt strong encryption like SHA256, right now"
+    'Can we train a model specifically for breaking SHA25? Pair a string with its encoded SHA256 message'
+    'and store it inside memory or a database'
