@@ -1,6 +1,11 @@
-langchain
-openai
 numpy
 pandas
 matplotlib
 seaborn
+langchain==0.2.16
+langchain-community
+langchain-openai==0.1.9
+huggingface-hub==0.23.4
+charset-normalizer==2.0.12
+mkl=2021.4.0
+s3fs=2023.4.0
