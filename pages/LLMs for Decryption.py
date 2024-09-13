@@ -6,17 +6,8 @@ st.subheader("Can LLMs be an alternative solution for decryption?", divider="gra
 
 """
 This page is for showcasing one of the existing solutions to decrypting non-[bijective](https://en.wikipedia.org/wiki/Bijection) encryption and non-reversible encryption.
-I will be showcasing this solution using [Pig Latin](https://en.wikipedia.org/wiki/Pig_Latin#Rules) as the encoder.
-
-Why Pig Latin for two reasons:
-
-- Two inputs can output the same value (non-bijective)
-- Some information are lost upon encoding/decoding (You'll see later)
-- It is a poor way to encrypt data
-
-
-
-##### -> So it only works on weak encryption?
+I will be showcasing this solution using [Pig Latin](https://en.wikipedia.org/wiki/Pig_Latin#Rules) as one of the encoder.
+[Base64](https://en.wikipedia.org/wiki/Base64) wikipedia link.
 
 Although this solution can't go against powerful non-reversible encryption like SHA-256 or MD5, I think it is still worth showcasing for the following reasons:
 
