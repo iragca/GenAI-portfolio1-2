@@ -10,11 +10,13 @@ def ask_gemini(user_prompt):
 if 'history' not in st.session_state:
     st.session_state['history'] = []
 
+
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
+
 def display_chat_history():
     for chat in st.session_state['history']:
 
@@ -31,15 +33,17 @@ def display_chat_history():
 
         ## User profile image and name
         st.html("""
-        <div STYLE="text-align: right;">"""
-            +f"<small style=\"opacity: 0.5;\">{final_text}</small>"+
-            """<img src=\"https://github.com/Chris-Gari/Global-Terrorism-EDA/blob/main/chatbot2.png?raw=true\" alt=\"Placeholder Image\" style=\"padding: 10px; border-radius: 20px;\">
+        <div STYLE="text-align: right;">
+            <small style="opacity: 0.5;">"""
+            +f"{final_text}"+
+            """</small>
+            <img src="./app/static/images/chatbot/user.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         </div>
         """)
 
         ## User prompt
         st.html("""
-        <div style="text-align: right;">
+        <div style="text-align: right; overflow-wrap: break-word;">
             <div style="text-align: left; background-color: rgb(213, 84, 127, 0.25); display: inline-block; padding-top: 10px; padding-bottom: 10px; padding-right: 15px; padding-left: 15px; border-radius: 20px; overflow-wrap: break-word;">"""
                 +f"{chat[0]}"+
             """</div>
@@ -48,7 +52,7 @@ def display_chat_history():
 
         ## LLM profile image and name
         st.html(f"""
-        <img src="https://github.com/Chris-Gari/Global-Terrorism-EDA/blob/main/chatbot.png?raw=true" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
+        <img src="./app/static/images/chatbot/chatbot1.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         <small style="opacity: 0.5;">
             Gemini
         </small>
@@ -67,7 +71,7 @@ def display_chat_history():
 user_query = st.chat_input('Ask Gemini')
 
 if user_query != None:
-
     answer = 'Answer' #ask_gemini(user_query)
     st.session_state['history'].append((user_query, time.time(), answer))
-    display_chat_history()
+
+display_chat_history()
