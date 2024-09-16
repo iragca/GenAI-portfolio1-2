@@ -18,7 +18,7 @@ Although this solution can't go against powerful non-reversible encryption like 
 """
 '## Demonstrating LLMs for decrypting weak encryption'
 
-st.image('assets/images/apu1.jpeg')
+st.image('static/apu1.jpeg')
 
 """
 __This is Apu.__
