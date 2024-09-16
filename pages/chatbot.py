@@ -1,10 +1,6 @@
 from initialization import *
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-import time
 
-@st.cache_resource
-def ask_gemini(user_prompt):
-    return llm_gemini.invoke(user_prompt).content
 
 # initializing chat history as session state
 if 'history' not in st.session_state:
@@ -16,7 +12,6 @@ st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
-
 def display_chat_history():
     for chat in st.session_state['history']:
 
@@ -54,24 +49,52 @@ def display_chat_history():
         st.html(f"""
         <img src="./app/static/images/chatbot/chatbot1.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         <small style="opacity: 0.5;">
-            Gemini
+            Mistral
         </small>
         """)
 
         ## LLM Response
-        st.html("""
-        <div style="text-align: left;">
-            <div style="text-align: left; display: inline-block; padding-top: 10px; padding-bottom: 10px; padding-right: 15px; padding-left: 15px; border-radius: 20px; overflow-wrap: break-word;">"""
-                +f"{chat[2]}"+
-            """</div>
-        </div>
-        """)
+        # st.html("""
+        # <div style="text-align: left;">
+        #     <div style="text-align: left; display: inline-block; padding-top: 10px; padding-bottom: 10px; padding-right: 15px; padding-left: 15px; border-radius: 20px; overflow-wrap: break-word;">"""
+        #         +f"{chat[2]}"+
+        #     """</div>
+ 
+        # </div>
+        # """)
+
+        st.markdown(f"{chat[2]}")
 
 
-user_query = st.chat_input('Ask Gemini')
+user_query = st.chat_input('Ask Mistral')
+
+@st.cache_resource
+def ask_mistral(query):
+    return llm_mistral.invoke(query)
+
+@st.cache_resource
+def ask_gemini(user_prompt):
+    return llm_gemini.invoke(user_prompt).content
+
+
+if "sessionMessages" not in st.session_state:
+    st.session_state["sessionMessages"] = [SystemMessage(content="")]
+    
+@st.cache_resource
+def load_answer(question):
+    st.session_state["sessionMessages"].append(HumanMessage(content=question))
+    assistant_answer = llm_mistralai.invoke(st.session_state["sessionMessages"])
+    st.session_state["sessionMessages"].append(AIMessage(content=assistant_answer.content))
+
+    return assistant_answer.content
+
 
 if user_query != None:
-    answer = 'Answer' #ask_gemini(user_query)
+    answer = load_answer(user_query)
     st.session_state['history'].append((user_query, time.time(), answer))
 
 display_chat_history()
+st.write(st.session_state["sessionMessages"])
+
+
+
