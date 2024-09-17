@@ -9,7 +9,7 @@ if 'phi_history' not in st.session_state:
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
 if "phi_messages" not in st.session_state:
-    st.session_state["phi_messages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+    st.session_state["phi_messages"] = [{"role": "system", "content": 'You are a helpful assistant.'}]
 
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
@@ -36,8 +36,8 @@ def display_chat_history():
         # total_tokens = tokens["total_tokens"]
 
         # Token summary
-        ct, pt, tk = st.session_state['phi_history'][0][2].usage
-
+        model = chat[2].model
+        ct, pt, tk = chat[2].usage
         ## User profile image and name
         st.html("""
         <div STYLE="text-align: right;">
@@ -65,21 +65,16 @@ def display_chat_history():
         """</small>
         """)
 
-        ## LLM Response
-        # st.html("""
-        # <div style="text-align: left;">
-        #     <div style="text-align: left; display: inline-block; padding-top: 10px; padding-bottom: 10px; padding-right: 15px; padding-left: 15px; border-radius: 20px; overflow-wrap: break-word;">"""
-        #         +f"{chat[2]}"+
-        #     """</div>
- 
-        # </div>
-        # """)
+        ## Token Summary
         st.html(f"""
         <small style="opacity: 0.5;">"""
-            +f"Completion Tokens: {ct[1]} | Prompt Tokens: {pt[1]} | Total Tokens: {tk[1]}"
+            +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]}"
         """</small>
         """)
-        st.markdown(f"{chat[2].choices[0].message.content}")
+
+        ## LLM Response
+
+        st.markdown(f"{ chat[2].choices[0].message.content}")
 
 user_query = st.chat_input('Ask Phi')
 
@@ -90,35 +85,21 @@ client = openai.OpenAI(
 )
 
 
-def local_phi():
-	
-	completion = client.chat.completions.create(
-    model="Phi-3.5-mini-instruct-Q5_K_M",
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What a lovely day today, right?"}
-    ]
-	)
-	
-	return completion
 
 @st.cache_resource
 def ask_phi(query):
 
     st.session_state["phi_messages"].append({"role": "user", "content": query})
     completion = client.chat.completions.create(
-        model="Phi-3.5-mini-instruct-Q5_K_M",
-        messages = st.session_state["phi_Messages"]
+        model="Phi-3.5-mini-instruct-Q8_0",
+        messages = st.session_state["phi_messages"]
     )
-
+    st.session_state["phi_messages"].append({"role": "assistant", "content": completion.choices[0].message.content})
     return completion
 
 if user_query != None:
     answer = ask_phi(user_query)
-    st.session_state['history'].append((user_query, time.time(), answer))
+    st.session_state['phi_history'].append((user_query, time.time(), answer))
     
 
 display_chat_history()
-st.session_state['phi_messages']
-
-# st.session_state['history'][0][2].usage.total_tokens
