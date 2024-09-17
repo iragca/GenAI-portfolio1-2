@@ -1,7 +1,4 @@
 from initialization import *
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-
-#llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file ./Phi-3.5-mini-instruct-Q5_K_M.gguf -c 512 
 
 # initializing chat history as session state
 if 'phi_history' not in st.session_state:
