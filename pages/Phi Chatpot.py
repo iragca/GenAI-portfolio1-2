@@ -70,36 +70,13 @@ def display_chat_history():
         st.markdown(f"{chat[2]}")
         
 
-user_query = st.chat_input('Ask Mistral')
-
-@st.cache_resource
-def ask_mistral(query):
-    return llm_mistral.invoke(query)
-
-@st.cache_resource
-def ask_gemini(user_prompt):
-    return llm_gemini.invoke(user_prompt).content
+user_query = st.chat_input('Ask Phi')
 
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
 if "sessionMessages" not in st.session_state:
-    #st.session_state["sessionMessages"] = [SystemMessage(content="You are a helpful assistant.")]
-    #st.session_state["sessionMessages"] = [("system", "You are a helpful assistant.")]
     st.session_state["sessionMessages"] = [{"role": "system", "content": "You are a helpful assistant."}]
 
-@st.cache_resource
-def ask_openai(question):
-    st.session_state["sessionMessages"].append(HumanMessage(content=question))
-    assistant_answer = llm_openai.invoke(st.session_state["sessionMessages"])
-    st.session_state["sessionMessages"].append(AIMessage(content=assistant_answer.content))
-    return assistant_answer
-
-@st.cache_resource
-def ask_mistralai(question):
-    st.session_state["sessionMessages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["sessionMessages"])
-    st.session_state["sessionMessages"].append(("assistant", assistant_answer.content))
-    return assistant_answer
 
 
 
@@ -111,7 +88,6 @@ client = openai.OpenAI(
     base_url="http://192.168.1.100:5001/v1",
     api_key = "sk-no-key-required"
 )
-
 
 
 def local_phi():
@@ -142,7 +118,6 @@ if user_query != None:
     st.session_state['history'].append((user_query, time.time(), answer))
 
 display_chat_history()
-# st.write(st.session_state["sessionMessages"])
 
 
 

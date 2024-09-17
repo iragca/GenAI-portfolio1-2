@@ -18,18 +18,22 @@ To install langchain-community run `pip install -U langchain-community`.
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 import langchain_mistralai
 
-# from langchain_community.chat_models.huggingface import ChatHuggingFace
-# from langchain_community.llms import HuggingFaceEndpoint
+from langchain_community.chat_models.huggingface import ChatHuggingFace
+from langchain_community.llms import HuggingFaceEndpoint
 
 # endpoint_url = (
 #     "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2"
 # )
 # hf = HuggingFaceEndpoint(
-#     endpoint_url=endpoint_url,
+#     # endpoint_url=endpoint_url,
+#     repo_id="mistralai/Mistral-7B-Instruct-v0.2",
 #     huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"]
 # )
+
+
 
 # llm_mistral = HuggingFaceEndpoint(repo_id="mistralai/Mistral-7B-Instruct-v0.2")
 """Service (?) Error
@@ -38,5 +42,27 @@ InferenceTimeoutError: Model not loaded on the server: https://api-inference.hug
 
 
 llm_gemini = ChatGoogleGenerativeAI(model="gemini-pro")
-llm_openai = OpenAI(model="gpt-3.5-turbo-instruct")
+llm_openai = ChatOpenAI() #OpenAI(model="gpt-3.5-turbo-instruct")
 llm_mistralai = langchain_mistralai.ChatMistralAI(model="mistral-large-latest")
+
+
+from llama_cpp import Llama
+from langchain_community.chat_models.llamacpp import ChatLlamaCpp
+
+# llm_llama = ChatLlamaCpp()
+
+# llm = Llama(
+# 	repo_id="mradermacher/dolphin-2.9.3-mistral-nemo-12b-llamacppfixed-GGUF",
+# 	filename="dolphin-2.9.3-mistral-nemo-12b-llamacppfixed.IQ3_M.gguf",
+# )
+
+# llm.create_chat_completion(
+# 	messages = [
+# 		{
+# 			"role": "user",
+# 			"content": "What is the capital of France?"
+# 		}
+# 	]
+# )
+
+
