@@ -1,12 +1,10 @@
 from initialization import *
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-#llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file ./Phi-3.5-mini-instruct-Q5_K_M.gguf -c 512 
 
 # initializing chat history as session state
 if 'history' not in st.session_state:
     st.session_state['history'] = []
-
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
@@ -70,48 +68,28 @@ def display_chat_history():
         st.markdown(f"{chat[2]}")
         
 
-user_query = st.chat_input('Ask Phi')
+user_query = st.chat_input('Ask Mistral')
 
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
 if "sessionMessages" not in st.session_state:
-    st.session_state["sessionMessages"] = [{"role": "system", "content": "You are a helpful assistant."}]
-
-
-
-
-
-import openai
-
-client = openai.OpenAI(
-    # base_url="http://localhost:8080",
-    base_url="http://192.168.1.100:5001/v1",
-    api_key = "sk-no-key-required"
-)
-
-
-def local_phi():
-	
-	completion = client.chat.completions.create(
-    model="Phi-3.5-mini-instruct-Q5_K_M",
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What a lovely day today, right?"}
-    ]
-	)
-	
-	return completion
+    #st.session_state["sessionMessages"] = [SystemMessage(content="You are a helpful assistant.")]
+    #st.session_state["sessionMessages"] = [("system", "You are a helpful assistant.")]
 
 @st.cache_resource
-def ask_phi(query):
+def ask_openai(question):
+    st.session_state["sessionMessages"].append(HumanMessage(content=question))
+    assistant_answer = llm_openai.invoke(st.session_state["sessionMessages"])
+    st.session_state["sessionMessages"].append(AIMessage(content=assistant_answer.content))
+    return assistant_answer
 
-    st.session_state["sessionMessages"].append({"role": "user", "content": query})
-    completion = client.chat.completions.create(
-        model="Phi-3.5-mini-instruct-Q5_K_M",
-        messages = st.session_state["sessionMessages"]
-    )
+@st.cache_resource
+def ask_mistralai(question):
+    st.session_state["sessionMessages"].append(("human", question))
+    assistant_answer = llm_mistralai.invoke(st.session_state["sessionMessages"])
+    st.session_state["sessionMessages"].append(("assistant", assistant_answer.content))
+    return assistant_answer
 
-    return completion
 
 if user_query != None:
     answer = ask_phi(user_query)

@@ -16,6 +16,7 @@ Please import from langchain-community instead:`from langchain_community.llms im
 To install langchain-community run `pip install -U langchain-community`.
 """
 
+import openai
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
@@ -45,24 +46,5 @@ llm_gemini = ChatGoogleGenerativeAI(model="gemini-pro")
 llm_openai = ChatOpenAI() #OpenAI(model="gpt-3.5-turbo-instruct")
 llm_mistralai = langchain_mistralai.ChatMistralAI(model="mistral-large-latest")
 
-
-from llama_cpp import Llama
-from langchain_community.chat_models.llamacpp import ChatLlamaCpp
-
-# llm_llama = ChatLlamaCpp()
-
-# llm = Llama(
-# 	repo_id="mradermacher/dolphin-2.9.3-mistral-nemo-12b-llamacppfixed-GGUF",
-# 	filename="dolphin-2.9.3-mistral-nemo-12b-llamacppfixed.IQ3_M.gguf",
-# )
-
-# llm.create_chat_completion(
-# 	messages = [
-# 		{
-# 			"role": "user",
-# 			"content": "What is the capital of France?"
-# 		}
-# 	]
-# )
 
 

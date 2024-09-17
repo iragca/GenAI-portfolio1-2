@@ -7,6 +7,10 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 if 'history' not in st.session_state:
     st.session_state['history'] = []
 
+# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
+if "sessionMessages" not in st.session_state:
+    st.session_state["sessionMessages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
@@ -31,6 +35,8 @@ def display_chat_history():
         # tokens = chat[2].response_metadata["token_usage"]
         # total_tokens = tokens["total_tokens"]
         ## User profile image and name
+
+        ct, pt, tk = st.session_state['history'][0][2].usage
         st.html("""
         <div STYLE="text-align: right;">
             <small style="opacity: 0.5;">"""
@@ -53,7 +59,7 @@ def display_chat_history():
         st.html(f"""
         <img src="./app/static/images/chatbot/chatbot1.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         <small style="opacity: 0.5;">"""
-            +f"Mistral (Tokens used: {1})"
+            +f"Phi"
         """</small>
         """)
 
@@ -66,46 +72,51 @@ def display_chat_history():
  
         # </div>
         # """)
+        st.html(f"""
+        <small style="opacity: 0.5;">"""
+            +f"Completion Tokens: {ct[1]} | Prompt Tokens: {pt[1]} | Total Tokens: {tk[1]}"
+        """</small>
+        """)
+        st.markdown(f"{chat[2].choices[0].message.content}")
 
-        st.markdown(f"{chat[2]}")
-        
+user_query = st.chat_input('Ask Phi')
 
-user_query = st.chat_input('Ask Mistral')
+client = openai.OpenAI(
+    # base_url="http://localhost:8080",
+    base_url="http://192.168.1.100:5001/v1",
+    api_key = "sk-no-key-required"
+)
+
+
+def local_phi():
+	
+	completion = client.chat.completions.create(
+    model="Phi-3.5-mini-instruct-Q5_K_M",
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What a lovely day today, right?"}
+    ]
+	)
+	
+	return completion
 
 @st.cache_resource
-def ask_mistral(query):
-    return llm_mistral.invoke(query)
+def ask_phi(query):
 
-@st.cache_resource
-def ask_gemini(user_prompt):
-    return llm_gemini.invoke(user_prompt).content
+    st.session_state["sessionMessages"].append({"role": "user", "content": query})
+    completion = client.chat.completions.create(
+        model="Phi-3.5-mini-instruct-Q5_K_M",
+        messages = st.session_state["sessionMessages"]
+    )
 
-
-# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "sessionMessages" not in st.session_state:
-    #st.session_state["sessionMessages"] = [SystemMessage(content="You are a helpful assistant.")]
-    #st.session_state["sessionMessages"] = [("system", "You are a helpful assistant.")]
-
-@st.cache_resource
-def ask_openai(question):
-    st.session_state["sessionMessages"].append(HumanMessage(content=question))
-    assistant_answer = llm_openai.invoke(st.session_state["sessionMessages"])
-    st.session_state["sessionMessages"].append(AIMessage(content=assistant_answer.content))
-    return assistant_answer
-
-@st.cache_resource
-def ask_mistralai(question):
-    st.session_state["sessionMessages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["sessionMessages"])
-    st.session_state["sessionMessages"].append(("assistant", assistant_answer.content))
-    return assistant_answer
-
+    return completion
 
 if user_query != None:
     answer = ask_phi(user_query)
     st.session_state['history'].append((user_query, time.time(), answer))
+    
 
 display_chat_history()
+st.session_state['sessionMessages']
 
-
-
+# st.session_state['history'][0][2].usage.total_tokens
