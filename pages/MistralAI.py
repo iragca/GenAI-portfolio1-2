@@ -54,8 +54,8 @@ def display_chat_history():
 
         ## LLM profile image and name
         st.html(f"""
-        <img src="./app/static/images/chatbot/mistralai.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
-        <small style="opacity: 0.5;">"""
+        <img src="./app/static/images/chatbot/mistralai.webp" alt="Placeholder Image" style="padding: 5px; border-radius: 10px; background-color: rgb(255, 255, 255, 0.10); max-height: 32px; max-width: 100%; height: auto; width: auto;">
+        <small style="opacity: 0.5; padding: 10px;">"""
             +f"MistralAI"
         """</small>
         """)
