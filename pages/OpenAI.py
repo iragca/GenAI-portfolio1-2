@@ -1,12 +1,13 @@
 from initialization import *
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 # initializing chat history as session state
-if 'mistralai_history' not in st.session_state:
-    st.session_state['mistralai_history'] = []
+if 'openai_history' not in st.session_state:
+    st.session_state['openai_history'] = []
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "mistralai_messages" not in st.session_state:
-    st.session_state["mistralai_messages"] = [] #[("system", "You are a helpful assistant.")] # MistralAI's prompt schema is yet to be known
+if "openai_messages" not in st.session_state:
+    st.session_state["openai_messages"] = [SystemMessage(content="You are a helpful assistant.")]
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
@@ -14,7 +15,7 @@ st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
 def display_chat_history():
-    for chat in st.session_state['mistralai_history']:
+    for chat in st.session_state['openai_history']:
 
         ## timestamp
         time_history = time.time() - chat[1]
@@ -27,12 +28,13 @@ def display_chat_history():
             text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
             final_text = f"{text} {text2} ago"
 
-        model = chat[2].response_metadata["model"]
+
+        model = chat[2].response_metadata["model_name"]
         tokens = chat[2].response_metadata["token_usage"]
         prompt_tokens = tokens["prompt_tokens"]
         completion_tokens = tokens["completion_tokens"]
         total_tokens = tokens["total_tokens"]
-        
+
         ## User profile image and name
         st.html("""
         <div STYLE="text-align: right;">
@@ -54,12 +56,12 @@ def display_chat_history():
 
         ## LLM profile image and name
         st.html(f"""
-        <img src="./app/static/images/chatbot/mistralai.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
+        <img src="./app/static/images/chatbot/openai.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         <small style="opacity: 0.5;">"""
-            +f"MistralAI"
+            +f"ChatGPT"
         """</small>
         """)
-        
+
         ## Token Summary
         st.html(f"""
         <small style="opacity: 0.5;">"""
@@ -69,19 +71,22 @@ def display_chat_history():
 
         ## LLM Response
         st.markdown(f"{chat[2].content}")
+        
 
-user_query = st.chat_input('Ask MistralAI')
+user_query = st.chat_input('Ask OpenAI')
 
 @st.cache_resource
-def ask_mistralai(question):
-    st.session_state["mistralai_messages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["mistralai_messages"])
-    st.session_state["mistralai_messages"].append(("assistant", assistant_answer.content))
+def ask_openai(question):
+    st.session_state["openai_messages"].append(HumanMessage(content=question))
+    assistant_answer = llm_openai.invoke(st.session_state["openai_messages"])
+    st.session_state["openai_messages"].append(AIMessage(content=assistant_answer.content))
     return assistant_answer
 
-
 if user_query != None:
-    answer = ask_mistralai(user_query)
-    st.session_state['mistralai_history'].append((user_query, time.time(), answer))
+    answer = ask_openai(user_query)
+    st.session_state['openai_history'].append((user_query, time.time(), answer))
 
 display_chat_history()
+
+
+

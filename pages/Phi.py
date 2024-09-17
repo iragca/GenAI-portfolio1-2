@@ -4,12 +4,12 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 #llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file ./Phi-3.5-mini-instruct-Q5_K_M.gguf -c 512 
 
 # initializing chat history as session state
-if 'history' not in st.session_state:
-    st.session_state['history'] = []
+if 'phi_history' not in st.session_state:
+    st.session_state['phi_history'] = []
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "sessionMessages" not in st.session_state:
-    st.session_state["sessionMessages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+if "phi_messages" not in st.session_state:
+    st.session_state["phi_messages"] = [{"role": "system", "content": "You are a helpful assistant."}]
 
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
@@ -18,7 +18,7 @@ st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
 def display_chat_history():
-    for chat in st.session_state['history']:
+    for chat in st.session_state['phi_history']:
 
         ## timestamp
         time_history = time.time() - chat[1]
@@ -34,9 +34,11 @@ def display_chat_history():
 
         # tokens = chat[2].response_metadata["token_usage"]
         # total_tokens = tokens["total_tokens"]
-        ## User profile image and name
 
-        ct, pt, tk = st.session_state['history'][0][2].usage
+        # Token summary
+        ct, pt, tk = st.session_state['phi_history'][0][2].usage
+
+        ## User profile image and name
         st.html("""
         <div STYLE="text-align: right;">
             <small style="opacity: 0.5;">"""
@@ -103,10 +105,10 @@ def local_phi():
 @st.cache_resource
 def ask_phi(query):
 
-    st.session_state["sessionMessages"].append({"role": "user", "content": query})
+    st.session_state["phi_messages"].append({"role": "user", "content": query})
     completion = client.chat.completions.create(
         model="Phi-3.5-mini-instruct-Q5_K_M",
-        messages = st.session_state["sessionMessages"]
+        messages = st.session_state["phi_Messages"]
     )
 
     return completion
@@ -117,6 +119,6 @@ if user_query != None:
     
 
 display_chat_history()
-st.session_state['sessionMessages']
+st.session_state['phi_messages']
 
 # st.session_state['history'][0][2].usage.total_tokens

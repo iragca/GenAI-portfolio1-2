@@ -1,12 +1,12 @@
 from initialization import *
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+
+#llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file ./Phi-3.5-mini-instruct-Q5_K_M.gguf -c 512 
 
 # initializing chat history as session state
-if 'mistralai_history' not in st.session_state:
-    st.session_state['mistralai_history'] = []
+if 'history' not in st.session_state:
+    st.session_state['history'] = []
 
-# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "mistralai_messages" not in st.session_state:
-    st.session_state["mistralai_messages"] = [] #[("system", "You are a helpful assistant.")] # MistralAI's prompt schema is yet to be known
 
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
@@ -14,7 +14,7 @@ st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
 def display_chat_history():
-    for chat in st.session_state['mistralai_history']:
+    for chat in st.session_state['history']:
 
         ## timestamp
         time_history = time.time() - chat[1]
@@ -27,12 +27,9 @@ def display_chat_history():
             text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
             final_text = f"{text} {text2} ago"
 
-        model = chat[2].response_metadata["model"]
-        tokens = chat[2].response_metadata["token_usage"]
-        prompt_tokens = tokens["prompt_tokens"]
-        completion_tokens = tokens["completion_tokens"]
-        total_tokens = tokens["total_tokens"]
-        
+
+        # tokens = chat[2].response_metadata["token_usage"]
+        # total_tokens = tokens["total_tokens"]
         ## User profile image and name
         st.html("""
         <div STYLE="text-align: right;">
@@ -54,34 +51,42 @@ def display_chat_history():
 
         ## LLM profile image and name
         st.html(f"""
-        <img src="./app/static/images/chatbot/mistralai.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
+        <img src="./app/static/images/chatbot/chatbot1.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
         <small style="opacity: 0.5;">"""
-            +f"MistralAI"
-        """</small>
-        """)
-        
-        ## Token Summary
-        st.html(f"""
-        <small style="opacity: 0.5;">"""
-            +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens}"
+            +f"Mistral (Tokens used: {1})"
         """</small>
         """)
 
         ## LLM Response
-        st.markdown(f"{chat[2].content}")
+        # st.html("""
+        # <div style="text-align: left;">
+        #     <div style="text-align: left; display: inline-block; padding-top: 10px; padding-bottom: 10px; padding-right: 15px; padding-left: 15px; border-radius: 20px; overflow-wrap: break-word;">"""
+        #         +f"{chat[2]}"+
+        #     """</div>
+ 
+        # </div>
+        # """)
 
-user_query = st.chat_input('Ask MistralAI')
+        st.markdown(f"{chat[2]}")
+        
+
+user_query = st.chat_input('Ask Mistral')
 
 @st.cache_resource
-def ask_mistralai(question):
-    st.session_state["mistralai_messages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["mistralai_messages"])
-    st.session_state["mistralai_messages"].append(("assistant", assistant_answer.content))
-    return assistant_answer
+def ask_mistral(query):
+    return llm_mistral.invoke(query)
 
+
+# # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
+# if "sessionMessages" not in st.session_state:
+#     #st.session_state["sessionMessages"] = [SystemMessage(content="You are a helpful assistant.")]
+#     #st.session_state["sessionMessages"] = [("system", "You are a helpful assistant.")]
 
 if user_query != None:
-    answer = ask_mistralai(user_query)
-    st.session_state['mistralai_history'].append((user_query, time.time(), answer))
+    answer = ask_mistral(user_query)
+    st.session_state['history'].append((user_query, time.time(), answer))
 
 display_chat_history()
+
+
+

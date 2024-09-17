@@ -36,7 +36,7 @@ from langchain_community.llms import HuggingFaceEndpoint
 
 
 
-# llm_mistral = HuggingFaceEndpoint(repo_id="mistralai/Mistral-7B-Instruct-v0.2")
+llm_mistral = HuggingFaceEndpoint(repo_id="mistralai/Mistral-7B-Instruct-v0.2")
 """Service (?) Error
 InferenceTimeoutError: Model not loaded on the server: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2. Please retry with a higher timeout (current: 120).
 """
