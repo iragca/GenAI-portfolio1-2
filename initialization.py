@@ -36,7 +36,7 @@ from langchain_community.llms import HuggingFaceEndpoint
 
 
 
-llm_mistral = HuggingFaceEndpoint(repo_id="mistralai/Mistral-7B-Instruct-v0.2")
+llm_mistral = HuggingFaceEndpoint(repo_id="google/flan-t5-large")
 """Service (?) Error
 InferenceTimeoutError: Model not loaded on the server: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2. Please retry with a higher timeout (current: 120).
 """
@@ -45,6 +45,4 @@ InferenceTimeoutError: Model not loaded on the server: https://api-inference.hug
 llm_gemini = ChatGoogleGenerativeAI(model="gemini-pro")
 llm_openai = ChatOpenAI() #OpenAI(model="gpt-3.5-turbo-instruct")
 llm_mistralai = langchain_mistralai.ChatMistralAI(model="mistral-large-latest")
-
-
 

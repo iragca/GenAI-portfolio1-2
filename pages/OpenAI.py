@@ -18,9 +18,9 @@ def display_chat_history():
     for chat in st.session_state['openai_history']:
 
         ## timestamp
-        time_history = time.time() - chat[1]
+        time_history = chat[1][1] - chat[1][0]
         if time_history < 60:
-            final_text = f"{time_history:.0f} seconds ago" if time_history > 1 else "Now"
+            final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
         else:
             mins = time_history // 60
             secs = time_history % 60
@@ -65,7 +65,7 @@ def display_chat_history():
         ## Token Summary
         st.html(f"""
         <small style="opacity: 0.5;">"""
-            +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens}"
+            +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {time_history:.2f}"
         """</small>
         """)
 
@@ -83,10 +83,9 @@ def ask_openai(question):
     return assistant_answer
 
 if user_query != None:
+    start_time = time.time()
     answer = ask_openai(user_query)
-    st.session_state['openai_history'].append((user_query, time.time(), answer))
+    end_time = time.time()
+    st.session_state['openai_history'].append((user_query, (start_time, end_time), answer))
 
 display_chat_history()
-
-
-

@@ -18,7 +18,7 @@ def display_chat_history():
     for chat in st.session_state['phi_history']:
 
         ## timestamp
-        time_history = time.time() - chat[1]
+        time_history = chat[1][1] - chat[1][0]
         if time_history < 60:
             final_text = f"{time_history:.0f} seconds ago" if time_history > 1 else "Now"
         else:
@@ -35,7 +35,7 @@ def display_chat_history():
         # Token summary
         model = chat[2].model
         ct, pt, tk = chat[2].usage
-        ## User profile image and name
+        ## User profile image and nam
         st.html("""
         <div STYLE="text-align: right;">
             <small style="opacity: 0.5;">"""
@@ -65,7 +65,7 @@ def display_chat_history():
         ## Token Summary
         st.html(f"""
         <small style="opacity: 0.5;">"""
-            +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]}"
+            +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]} <br>Processing Time: {time_history}"
         """</small>
         """)
 
@@ -76,8 +76,8 @@ def display_chat_history():
 user_query = st.chat_input('Ask Phi')
 
 client = openai.OpenAI(
-    # base_url="http://localhost:8080",
-    base_url="http://192.168.1.100:5001/v1",
+    base_url="http://localhost:8080",
+    # base_url="http://192.168.1.100:5001/v1",
     api_key = "sk-no-key-required"
 )
 
@@ -95,8 +95,10 @@ def ask_phi(query):
     return completion
 
 if user_query != None:
+    start_time = time.time()
     answer = ask_phi(user_query)
-    st.session_state['phi_history'].append((user_query, time.time(), answer))
+    end_time = time.time()
+    st.session_state['phi_history'].append((user_query, (start_time, end_time), answer))
     
 
 display_chat_history()
