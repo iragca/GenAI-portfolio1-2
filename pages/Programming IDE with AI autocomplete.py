@@ -1,5 +1,6 @@
 from initialization import *
 from langchain.text_splitter import CharacterTextSplitter
+st.set_page_config(page_title="Chris Irag", page_icon="♿")
 
 code = st.text_area(label='IDE', height=720,)
 

@@ -1,5 +1,5 @@
 from initialization import * 
-
+st.set_page_config(page_title="Chris Irag", page_icon="♿")
 
 st.write(
 """

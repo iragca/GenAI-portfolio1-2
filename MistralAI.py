@@ -64,7 +64,7 @@ def display_chat_history(response_metadata=False, message_age=False):
                 +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
             """</small>
             """)
-
+            
         ## LLM Response
         st.markdown(f"{chat[2].content}")
 

@@ -27,6 +27,7 @@ He is powered by Mistral (mistralai/Mistral-7B-Instruct-v0.2).
 You can ask him anything but beware, he is not that good at talking.
 
 """
+st.set_page_config(page_title="Chris Irag", page_icon="♿")
 
 
 @st.cache_resource

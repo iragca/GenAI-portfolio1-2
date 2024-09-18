@@ -1,5 +1,6 @@
 from initialization import *
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+st.set_page_config(page_title="Chris Irag", page_icon="♿")
 
 
 #llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file Phi-3.5-mini-instruct-Q4_0_4_4.gguf -c 4096
@@ -19,7 +20,7 @@ if not st.session_state['main_init']:
     """)
     this_option = st.selectbox(
     "Who would you like to talk to?",
-    ("OpenAI", "MistralAI", "Gemini", "Phi"),
+    ("OpenAI", "MistralAI", "Gemini", "Phi", "Llama"),
     index=None,
     placeholder="Select Chatbot",
     key=303
@@ -28,7 +29,7 @@ if not st.session_state['main_init']:
 
 
     enable_switching_init = True if this_option == None else False
-    init_chat = st.button("Chat Now", disabled=enable_switching_init, help='Choose a chatbot to switch to.')
+    init_chat = st.button("Chat Now", disabled=enable_switching_init, help='Choose a chatbot to chat with')
     
     if init_chat:
         st.session_state['chat_option'] = this_option
@@ -74,7 +75,7 @@ if st.session_state['main_init']:
     try:
         option = st.sidebar.selectbox(
             "Switch chatbot",
-            ("OpenAI", "MistralAI", "Gemini", "Phi"),
+            ("OpenAI", "MistralAI", "Gemini", "Phi", "Llama"),
             index=None,
             placeholder="Switch Chatbot",
             key=302,
@@ -82,7 +83,7 @@ if st.session_state['main_init']:
         ) 
 
         enable_switching = True if option == None else False
-        switch_chat = st.sidebar.button("Switch Now", disabled=enable_switching, help='Choose a chatbot to switch to.')
+        switch_chat = st.sidebar.button("Switch Now", disabled=enable_switching, help='Choose a chatbot to switch to')
         
         if switch_chat:
             st.session_state['chat_option'] = option
@@ -90,8 +91,8 @@ if st.session_state['main_init']:
 
         st.sidebar.markdown(" *** ")
         st.sidebar.header("Chat Settings")
-        toggle_display_metadata = st.sidebar.toggle("Enable Response Metadata")
-        toggle_display_timestamp = st.sidebar.toggle("Enable Message Age")
+        st.session_state["toggle_display_metadata"] = st.sidebar.toggle("Enable Response Metadata")
+        st.session_state["toggle_display_timestamp"] = st.sidebar.toggle("Enable Message Age")
 
         user_query = st.chat_input(f"Ask {chat}")
 
@@ -101,7 +102,8 @@ if st.session_state['main_init']:
             end_time = time.time()
             st.session_state[f'{chat}_history'].append((user_query, (start_time, end_time), answer))
 
-        display_chat_history(response_metadata=toggle_display_metadata, message_age=toggle_display_timestamp)
+        display_chat_history(response_metadata=st.session_state["toggle_display_metadata"], message_age=st.session_state["toggle_display_timestamp"])
+    
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
         st.info("""
@@ -116,7 +118,7 @@ if st.session_state['main_init']:
 
         st.info("""
         ### Wait
-
+        - Service is not available and should be available soon.
         - If this feature is yet to be supported.
         """)
         

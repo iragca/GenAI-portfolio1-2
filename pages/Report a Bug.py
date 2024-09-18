@@ -1,6 +1,7 @@
 from initialization import *
 import time as t
 import os
+st.set_page_config(page_title="Chris Irag", page_icon="♿")
 
 st.header("Report a Bug")
 
