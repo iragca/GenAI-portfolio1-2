@@ -1,33 +1,26 @@
 from initialization import *
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-# initializing chat history as session state
-if 'openai_history' not in st.session_state:
-    st.session_state['openai_history'] = []
-
-# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "openai_messages" not in st.session_state:
-    st.session_state["openai_messages"] = [SystemMessage(content="You are a helpful assistant.")]
-
-st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
-st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
-
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
-def display_chat_history():
-    for chat in st.session_state['openai_history']:
+def display_chat_history(response_metadata=False, message_age=False):
+    for chat in st.session_state['OpenAI_history']:
 
         ## timestamp
-        time_history = chat[1][1] - chat[1][0]
-        if time_history < 60:
-            final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
-        else:
-            mins = time_history // 60
-            secs = time_history % 60
-            text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
-            text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
-            final_text = f"{text} {text2} ago"
+        process_time = chat[1][1] - chat[1][0]
+        time_history = time.time() - chat[1][0]
 
+        if message_age:
+            if time_history < 60:
+                final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
+            else:
+                mins = time_history // 60
+                secs = time_history % 60
+                text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
+                text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
+                final_text = f"{text} {text2} ago"
+        else:
+            final_text = "User"
 
         model = chat[2].response_metadata["model_name"]
         tokens = chat[2].response_metadata["token_usage"]
@@ -62,30 +55,30 @@ def display_chat_history():
         """</small>
         """)
 
+
         ## Token Summary
-        st.html(f"""
-        <small style="opacity: 0.5;">"""
-            +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {time_history:.2f}"
-        """</small>
-        """)
+        if response_metadata:
+            st.html(f"""
+            <small style="opacity: 0.5;">"""
+                +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
+            """</small>
+            """)
 
         ## LLM Response
         st.markdown(f"{chat[2].content}")
         
 
-user_query = st.chat_input('Ask OpenAI')
+# user_query = st.chat_input('Ask OpenAI')
 
 @st.cache_resource
 def ask_openai(question):
-    st.session_state["openai_messages"].append(HumanMessage(content=question))
-    assistant_answer = llm_openai.invoke(st.session_state["openai_messages"])
-    st.session_state["openai_messages"].append(AIMessage(content=assistant_answer.content))
+    st.session_state["OpenAI_messages"].append(HumanMessage(content=question))
+    assistant_answer = llm_openai.invoke(st.session_state["OpenAI_messages"])
+    st.session_state["OpenAI_messages"].append(AIMessage(content=assistant_answer.content))
     return assistant_answer
 
-if user_query != None:
-    start_time = time.time()
-    answer = ask_openai(user_query)
-    end_time = time.time()
-    st.session_state['openai_history'].append((user_query, (start_time, end_time), answer))
-
-display_chat_history()
+# if user_query != None:
+#     start_time = time.time()
+#     answer = ask_openai(user_query)
+#     end_time = time.time()
+#     st.session_state['openai_history'].append((user_query, (start_time, end_time), answer))

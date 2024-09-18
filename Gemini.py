@@ -3,29 +3,26 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 #llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file ./Phi-3.5-mini-instruct-Q5_K_M.gguf -c 512 
 
-# initializing chat history as session state
-if 'gemini_history' not in st.session_state:
-    st.session_state['gemini_history'] = []
-
-
-st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
-st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
-
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
-def display_chat_history():
-    for chat in st.session_state['gemini_history']:
+def display_chat_history(response_metadata=False, message_age=False):
+    for chat in st.session_state['Gemini_history']:
 
         ## timestamp
-        time_history = time.time() - chat[1]
-        if time_history < 60:
-            final_text = f"{time_history:.0f} seconds ago" if time_history > 1 else "Now"
+        process_time = chat[1][1] - chat[1][0]
+        time_history = time.time() - chat[1][0]
+
+        if message_age:
+            if time_history < 60:
+                final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
+            else:
+                mins = time_history // 60
+                secs = time_history % 60
+                text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
+                text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
+                final_text = f"{text} {text2} ago"
         else:
-            mins = time_history // 60
-            secs = time_history % 60
-            text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
-            text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
-            final_text = f"{text} {text2} ago"
+            final_text = "User"
 
         # Token summary
         tokens = chat[2].usage_metadata
@@ -61,16 +58,17 @@ def display_chat_history():
         """)
 
         ## Token Summary
-        st.html(f"""
-        <small style="opacity: 0.5;">"""
-            +f"Model: N/A <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens}"
-        """</small>
-        """)
+        if response_metadata:
+            st.html(f"""
+            <small style="opacity: 0.5;">"""
+                +f"Model: N/A <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>{process_time:.2f}"
+            """</small>
+            """)
 
         st.markdown(f"{chat[2].content}")
         
 
-user_query = st.chat_input('Ask Gemini')
+
 
 # @st.cache_resource
 # def ask_gemini(user_prompt):
@@ -82,18 +80,10 @@ user_query = st.chat_input('Ask Gemini')
 
 # instantiating a list to store the whole conversation so far for giving context and memory for the LLM
 
-if "gemini_messages" not in st.session_state:
-    st.session_state["gemini_messages"] = [{"system": "You are a helpful assistant."}]
 
 @st.cache_resource
 def ask_gemini(user_prompt):
     return llm_gemini.invoke(user_prompt)
-
-if user_query != None:
-    answer = ask_gemini(user_query)
-    st.session_state['gemini_history'].append((user_query, time.time(), answer))
-
-display_chat_history()
 
 
 

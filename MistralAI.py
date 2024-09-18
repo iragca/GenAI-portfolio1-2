@@ -1,31 +1,15 @@
 from initialization import *
 
-# initializing chat history as session state
-if 'mistralai_history' not in st.session_state:
-    st.session_state['mistralai_history'] = []
-
-# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-if "mistralai_messages" not in st.session_state:
-    st.session_state["mistralai_messages"] = [] #[("system", "You are a helpful assistant.")] # MistralAI's prompt schema is yet to be known
-
-st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
-st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
-
-
-st.sidebar.header("Chat Settings")
-toggle_display_metadata = st.sidebar.toggle("Enable Response Metadata")
-toggle_display_timestamp = st.sidebar.toggle("Enable Timestamps")
-
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
-def display_chat_history():
-    for chat in st.session_state['mistralai_history']:
+def display_chat_history(response_metadata=False, message_age=False):
+    for chat in st.session_state['MistralAI_history']:
 
         ## timestamp
         process_time = chat[1][1] - chat[1][0]
         time_history = time.time() - chat[1][0]
 
-        if toggle_display_timestamp:
+        if response_metadata:
             if time_history < 60:
                 final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
             else:
@@ -74,7 +58,7 @@ def display_chat_history():
         
         
         ## Token Summary
-        if toggle_display_metadata:
+        if message_age:
             st.html(f"""
             <small style="opacity: 0.5;">"""
                 +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
@@ -84,20 +68,20 @@ def display_chat_history():
         ## LLM Response
         st.markdown(f"{chat[2].content}")
 
-user_query = st.chat_input('Ask MistralAI')
+# user_query = st.chat_input('Ask MistralAI')
 
 @st.cache_resource
 def ask_mistralai(question):
-    st.session_state["mistralai_messages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["mistralai_messages"])
-    st.session_state["mistralai_messages"].append(("assistant", assistant_answer.content))
+    st.session_state["MistralAI_messages"].append(("human", question))
+    assistant_answer = llm_mistralai.invoke(st.session_state["MistralAI_messages"])
+    st.session_state["MistralAI_messages"].append(("assistant", assistant_answer.content))
     return assistant_answer
 
 
-if user_query != None:
-    start_time = time.time()
-    answer = ask_mistralai(user_query)
-    end_time = time.time()
-    st.session_state['mistralai_history'].append((user_query, (start_time, end_time), answer))
+# if user_query != None:
+#     start_time = time.time()
+#     answer = ask_mistralai(user_query)
+#     end_time = time.time()
+#     st.session_state['mistralai_history'].append((user_query, (start_time, end_time), answer))
 
-display_chat_history()
+# display_chat_history()
