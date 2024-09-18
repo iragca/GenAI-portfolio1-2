@@ -11,6 +11,11 @@ if "mistralai_messages" not in st.session_state:
 st.warning('PROGRESS WILL BE LOST when closing this session. This prototype is session-based.', icon="⚠️")
 st.info('This prototype recommends using Dark Mode.', icon="ℹ️")
 
+
+st.sidebar.header("Chat Settings")
+toggle_display_metadata = st.sidebar.toggle("Enable Response Metadata")
+toggle_display_timestamp = st.sidebar.toggle("Enable Timestamps")
+
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
 def display_chat_history():
@@ -19,14 +24,20 @@ def display_chat_history():
         ## timestamp
         process_time = chat[1][1] - chat[1][0]
         time_history = time.time() - chat[1][0]
-        if time_history < 60:
-            final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
+
+        if toggle_display_timestamp:
+            if time_history < 60:
+                final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
+            else:
+                mins = time_history // 60
+                secs = time_history % 60
+                text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
+                text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
+                final_text = f"{text} {text2} ago"
         else:
-            mins = time_history // 60
-            secs = time_history % 60
-            text = f"{mins:.0f} mins" if mins > 1 else f"1 min"
-            text2 = f"{secs:.0f} secs" if secs > 1 else f"1 sec"
-            final_text = f"{text} {text2} ago"
+            final_text = "User"
+
+        
 
         model = chat[2].response_metadata["model"]
         tokens = chat[2].response_metadata["token_usage"]
@@ -61,12 +72,14 @@ def display_chat_history():
         """</small>
         """)
         
+        
         ## Token Summary
-        st.html(f"""
-        <small style="opacity: 0.5;">"""
-            +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
-        """</small>
-        """)
+        if toggle_display_metadata:
+            st.html(f"""
+            <small style="opacity: 0.5;">"""
+                +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
+            """</small>
+            """)
 
         ## LLM Response
         st.markdown(f"{chat[2].content}")
