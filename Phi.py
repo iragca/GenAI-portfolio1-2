@@ -3,13 +3,13 @@ from initialization import *
 ## display chat history using HTML
 ### Looking for more efficient ways to display chat history instead of a for loop!
 def display_chat_history(response_metadata=False, message_age=False):
-    for chat in st.session_state['MistralAI_history']:
+    for chat in st.session_state['Phi_history']:
 
         ## timestamp
         process_time = chat[1][1] - chat[1][0]
         time_history = time.time() - chat[1][0]
 
-        if response_metadata:
+        if message_age:
             if time_history < 60:
                 final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
             else:
@@ -21,15 +21,11 @@ def display_chat_history(response_metadata=False, message_age=False):
         else:
             final_text = "User"
 
-        
+        # Token summary
+        model = chat[2].model
+        ct, pt, tk = chat[2].usage
 
-        model = chat[2].response_metadata["model"]
-        tokens = chat[2].response_metadata["token_usage"]
-        prompt_tokens = tokens["prompt_tokens"]
-        completion_tokens = tokens["completion_tokens"]
-        total_tokens = tokens["total_tokens"]
-        
-        ## User profile image and name
+        ## User profile image and nam
         st.html("""
         <div STYLE="text-align: right;">
             <small style="opacity: 0.5;">"""
@@ -50,29 +46,36 @@ def display_chat_history(response_metadata=False, message_age=False):
 
         ## LLM profile image and name
         st.html(f"""
-        <img src="./app/static/images/chatbot/mistralai.webp" alt="Placeholder Image" style="padding: 5px; border-radius: 10px; background-color: rgb(255, 255, 255, 0.10); max-height: 32px; max-width: 100%; height: auto; width: auto;">
-        <small style="opacity: 0.5; padding: 10px;">"""
-            +f"MistralAI"
+        <img src="./app/static/images/chatbot/chatbot1.png" alt="Placeholder Image" style="padding: 10px; border-radius: 20px;">
+        <small style="opacity: 0.5;">"""
+            +f"Phi"
         """</small>
         """)
-        
-        
+
         ## Token Summary
-        if message_age:
+        if response_metadata:
             st.html(f"""
             <small style="opacity: 0.5;">"""
-                +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
+                +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]} <br>Processing Time: {process_time:.2f}"
             """</small>
             """)
 
         ## LLM Response
-        st.markdown(f"{chat[2].content}")
+
+        st.markdown(f"{chat[2].choices[0].message.content}".replace("\\n", ""))
+
+client = openai.OpenAI(
+    #base_url="http://localhost:8080",
+    base_url="http://192.168.1.100:5001/v1",
+    api_key = "sk-no-key-required"
+)
 
 @st.cache_resource
-def ask_mistralai(question):
-    st.session_state["MistralAI_messages"].append(("human", question))
-    assistant_answer = llm_mistralai.invoke(st.session_state["MistralAI_messages"])
-    st.session_state["MistralAI_messages"].append(("assistant", assistant_answer.content))
-    return assistant_answer
-
-
+def ask_phi(query):
+    st.session_state["Phi_messages"].append({"role": "user", "content": query})
+    completion = client.chat.completions.create(
+        model="Phi-3.5-mini-instruct-Q8_0",
+        messages = st.session_state["Phi_messages"]
+    )
+    st.session_state["Phi_messages"].append({"role": "assistant", "content": completion.choices[0].message.content})
+    return completion

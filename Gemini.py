@@ -68,23 +68,9 @@ def display_chat_history(response_metadata=False, message_age=False):
         st.markdown(f"{chat[2].content}")
         
 
-
-
-# @st.cache_resource
-# def ask_gemini(user_prompt):
-#     st.session_state["gemini_messages"].append([{"user": user_prompt}])
-#     assistant_answer = llm_gemini.invoke(user_prompt)
-#     st.session_state["gemini_messages"].append([{"assistant": assistant_answer.content}])
-#     return assistant_answer
-# gemini will block ChatBot prompting. will block for 'block_reason: 2'
-
-# instantiating a list to store the whole conversation so far for giving context and memory for the LLM
-
-
 @st.cache_resource
 def ask_gemini(user_prompt):
     return llm_gemini.invoke(user_prompt)
 
 
 
-# st.session_state["gemini_history"]

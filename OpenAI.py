@@ -67,9 +67,6 @@ def display_chat_history(response_metadata=False, message_age=False):
         ## LLM Response
         st.markdown(f"{chat[2].content}")
         
-
-# user_query = st.chat_input('Ask OpenAI')
-
 @st.cache_resource
 def ask_openai(question):
     st.session_state["OpenAI_messages"].append(HumanMessage(content=question))
@@ -77,8 +74,3 @@ def ask_openai(question):
     st.session_state["OpenAI_messages"].append(AIMessage(content=assistant_answer.content))
     return assistant_answer
 
-# if user_query != None:
-#     start_time = time.time()
-#     answer = ask_openai(user_query)
-#     end_time = time.time()
-#     st.session_state['openai_history'].append((user_query, (start_time, end_time), answer))

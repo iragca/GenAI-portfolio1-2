@@ -1,4 +1,6 @@
-import streamlit as st
+from initialization import *
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+
 
 #llama-server --hf-repo bartowski/Phi-3.5-mini-instruct-GGUF --hf-file Phi-3.5-mini-instruct-Q4_0_4_4.gguf -c 4096
 
@@ -24,13 +26,14 @@ if not st.session_state['main_init']:
     )
 
 
-    init_chat = st.button("Chat Now")
-    if init_chat and this_option != None:
+
+    enable_switching_init = True if this_option == None else False
+    init_chat = st.button("Chat Now", disabled=enable_switching_init, help='Choose a chatbot to switch to.')
+    
+    if init_chat:
         st.session_state['chat_option'] = this_option
         st.session_state['main_init'] = True
         st.rerun()
-    elif init_chat and this_option == None:
-        st.error("Please select a chatbot.")
     
 def init_session_vars(llm_name, prompt_schema=[]):
     st.header(f"{chat}")
@@ -59,36 +62,61 @@ if st.session_state['chat_option'] == "Gemini":
     from Gemini import ask_gemini as ask_llm
     init_session_vars("Gemini", [])
 
+if st.session_state['chat_option'] == "Phi":
+    chat = st.session_state['chat_option']
+    from Phi import display_chat_history
+    from Phi import ask_phi as ask_llm
+    init_session_vars("Phi", [{"role": "system", "content": 'You are a helpful assistant.'}])
+
 ####
 
 if st.session_state['main_init']:
-    option = st.sidebar.selectbox(
-        "Switch chatbot",
-        ("OpenAI", "MistralAI", "Gemini", "Phi"),
-        index=None,
-        placeholder="Switch Chatbot",
-        key=302,
-        label_visibility="collapsed"
-    ) 
+    try:
+        option = st.sidebar.selectbox(
+            "Switch chatbot",
+            ("OpenAI", "MistralAI", "Gemini", "Phi"),
+            index=None,
+            placeholder="Switch Chatbot",
+            key=302,
+            label_visibility="collapsed"
+        ) 
 
-    switch_chat = st.sidebar.button("Switch Now")
-    if switch_chat and option != None:
-        st.session_state['chat_option'] = option
-        st.rerun()
-    elif switch_chat and option == None:
-        st.sidebar.error("Please select a chatbot.")
+        enable_switching = True if option == None else False
+        switch_chat = st.sidebar.button("Switch Now", disabled=enable_switching, help='Choose a chatbot to switch to.')
+        
+        if switch_chat:
+            st.session_state['chat_option'] = option
+            st.rerun()
 
-    st.sidebar.markdown(" *** ")
-    st.sidebar.header("Chat Settings")
-    toggle_display_metadata = st.sidebar.toggle("Enable Response Metadata")
-    toggle_display_timestamp = st.sidebar.toggle("Enable Message Age")
+        st.sidebar.markdown(" *** ")
+        st.sidebar.header("Chat Settings")
+        toggle_display_metadata = st.sidebar.toggle("Enable Response Metadata")
+        toggle_display_timestamp = st.sidebar.toggle("Enable Message Age")
 
-    user_query = st.chat_input(f"Ask {chat}")
+        user_query = st.chat_input(f"Ask {chat}")
 
-    if user_query != None:
-        start_time = time.time()
-        answer = ask_llm(user_query)
-        end_time = time.time()
-        st.session_state[f'{chat}_history'].append((user_query, (start_time, end_time), answer))
+        if user_query != None:
+            start_time = time.time()
+            answer = ask_llm(user_query)
+            end_time = time.time()
+            st.session_state[f'{chat}_history'].append((user_query, (start_time, end_time), answer))
 
-    display_chat_history(response_metadata=toggle_display_metadata, message_age=toggle_display_timestamp)
+        display_chat_history(response_metadata=toggle_display_metadata, message_age=toggle_display_timestamp)
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.info("""
+        ## Please ...
+
+        ### Report
+
+        - If you think this is a bug.
+
+        """)
+        st.link_button("Report a Bug", "Report_a_Bug", type="primary")
+
+        st.info("""
+        ### Wait
+
+        - If this feature is yet to be supported.
+        """)
+        
