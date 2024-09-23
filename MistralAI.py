@@ -9,7 +9,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         process_time = chat[1][1] - chat[1][0]
         time_history = time.time() - chat[1][0]
 
-        if response_metadata:
+        if message_age:
             if time_history < 60:
                 final_text = f"{time_history:.0f} seconds ago" if time_history > 2 else "Now"
             else:
@@ -58,7 +58,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         
         
         ## Token Summary
-        if message_age:
+        if response_metadata:
             st.html(f"""
             <small style="opacity: 0.5;">"""
                 +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
@@ -76,3 +76,7 @@ def ask_mistralai(question):
     return assistant_answer
 
 
+def usage_metadata():
+    chat = st.session_state["MistralAI_history"][-1]
+    tokens = chat[2].response_metadata["token_usage"]
+    st.session_state["MistralAI_usage"].append(tokens["total_tokens"])
