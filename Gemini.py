@@ -72,5 +72,7 @@ def display_chat_history(response_metadata=False, message_age=False):
 def ask_gemini(user_prompt):
     return llm_gemini.invoke(user_prompt)
 
-
-
+def usage_metadata():
+    chat = st.session_state['Gemini_history'][-1]
+    tokens = chat[2].usage_metadata
+    st.session_state["Gemini_usage"].append(tokens["total_tokens"])

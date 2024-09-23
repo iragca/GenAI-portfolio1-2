@@ -74,3 +74,8 @@ def ask_openai(question):
     st.session_state["OpenAI_messages"].append(AIMessage(content=assistant_answer.content))
     return assistant_answer
 
+
+def usage_metadata():
+    chat = st.session_state["OpenAI_history"][-1]
+    tokens = chat[2].response_metadata["token_usage"]
+    st.session_state["OpenAI_usage"].append(tokens["total_tokens"])
