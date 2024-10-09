@@ -102,15 +102,17 @@ if st.session_state['main_init']:
             st.session_state['chat_option'] = option
             st.rerun()
 
-
-        #TODO: apply area chart input and output tokens
         @st.dialog("Usage Summary")
         def summary(chat):
             chats = {
-                "Total Tokens": st.session_state[f'{chat}_usage'],
+                "Input Tokens": [x[0] for x in st.session_state[f'{chat}_usage']],
+                "Output Tokens": [x[1] for x in st.session_state[f'{chat}_usage']],
                 "Message Number": [x for x in range(1, len(st.session_state[f'{chat}_usage'])+1)]
             }
-            st.area_chart(data=pd.DataFrame(chats), x="Message Number", y="Total Tokens")
+            st.area_chart(data=pd.DataFrame(chats), x="Message Number", y=["Output Tokens", "Input Tokens"], stack=True)
+            total_input = sum(chats["Input Tokens"])
+            total_output = sum(chats["Output Tokens"])
+            st.write(f"Input: {total_input}\n\nOutput: {total_output} \n\nTotal: {sum([total_input, total_output])}")
 
         st.sidebar.markdown(" *** ")
 

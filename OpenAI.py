@@ -60,7 +60,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         if response_metadata:
             st.html(f"""
             <small style="opacity: 0.5;">"""
-                +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time: {process_time:.2f}"
+                +f"Model: {model} <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>Processing Time (seconds): {process_time:.2f}"
             """</small>
             """)
 
@@ -78,4 +78,4 @@ def ask_openai(question):
 def usage_metadata():
     chat = st.session_state["OpenAI_history"][-1]
     tokens = chat[2].response_metadata["token_usage"]
-    st.session_state["OpenAI_usage"].append(tokens["total_tokens"])
+    st.session_state["OpenAI_usage"].append((tokens["prompt_tokens"], tokens["completion_tokens"]))

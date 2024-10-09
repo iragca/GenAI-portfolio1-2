@@ -61,7 +61,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         if response_metadata:
             st.html(f"""
             <small style="opacity: 0.5;">"""
-                +f"Model: N/A <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>{process_time:.2f}"
+                +f"Model: N/A <br>Prompt Tokens: {prompt_tokens} | Completion Tokens: {completion_tokens} | Total Tokens: {total_tokens} <br>>Processing Time (seconds): {process_time:.2f}"
             """</small>
             """)
 
@@ -75,4 +75,4 @@ def ask_gemini(user_prompt):
 def usage_metadata():
     chat = st.session_state['Gemini_history'][-1]
     tokens = chat[2].usage_metadata
-    st.session_state["Gemini_usage"].append(tokens["total_tokens"])
+    st.session_state["Gemini_usage"].append((tokens["input_tokens"], tokens["output_tokens"]))

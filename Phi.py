@@ -24,7 +24,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         # Token summary
         model = chat[2].model
         ct, pt, tk = chat[2].usage
-        _usage_metadata(tk)
+        usage_metadata()
 
         ## User profile image and nam
         st.html("""
@@ -57,7 +57,7 @@ def display_chat_history(response_metadata=False, message_age=False):
         if response_metadata:
             st.html(f"""
             <small style="opacity: 0.5;">"""
-                +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]} <br>Processing Time: {process_time:.2f}"
+                +f"Model: {model} <br>Prompt Tokens: {pt[1]} | Completion Tokens: {ct[1]} | Total Tokens: {tk[1]} <br>Processing Time (seconds): {process_time:.2f}"
             """</small>
             """)
 
@@ -67,8 +67,8 @@ def display_chat_history(response_metadata=False, message_age=False):
 
 client = openai.OpenAI(
     #base_url="http://localhost:8080",
-    base_url="http://172.28.110.188:8080",
-    # base_url="http://192.168.1.100:5001/v1",
+    # base_url="http://172.28.110.188:8080",
+    base_url="http://192.168.1.100:5001/v1",
     api_key = "sk-no-key-required"
 )
 
@@ -85,4 +85,4 @@ def ask_phi(query):
 def usage_metadata():
     chat = st.session_state["Phi_history"][-1]
     ct, pt, tk = chat[2].usage
-    st.session_state["Phi_usage"].append(tk)
+    st.session_state["Phi_usage"].append((pt[1], ct[1]))
