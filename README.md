@@ -5,6 +5,7 @@ streamlit run Home.py
 ```
 
 [Full paper here](https://github.com/iragca/GenAI-portfolio1-2/blob/main/JnI.pdf)
+
 Citation:
 ```bib
 @misc{jni_2024,
