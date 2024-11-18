@@ -13,7 +13,7 @@ Citation:
 	author = {Irag, Chris Andrei and Juanico, Hernel},
 	month = nov,
 	year = {2024},
-	keywords = {Generative AI - Chat robots - Large Language Models (LLMs) - Self-hostinge},
+	keywords = {Generative AI - Chat robots - Large Language Models (LLMs) - Self-hosting},
 
 }
 ```
