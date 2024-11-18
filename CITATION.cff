@@ -2,8 +2,11 @@ cff-version: 1.2.0
 message: "If you use this repository, please cite it using the following information."
 title: "Self-Hosted Context Aware Chatbot"
 authors:
-  - family-names: "Irag", "Juanico"
-    given-names: "Chris Andrei", "Hernel"
+  - family-names: "Irag"
+    given-names: "Chris Andrei"
+    orc-id: "https://orcid.org/0009-0005-0635-1666"
+  - family-names: "Juanico"
+    given-names: "Hernel"
 version: "1.0.0"
 date-released: "2024-11-18"
 doi: "10.1234/example-doi"
